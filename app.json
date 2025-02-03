@@ -2,7 +2,7 @@
   "expo": {
     "name": "MoneyApp",
     "slug": "MoneyApp",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -12,6 +12,8 @@
       "supportsTablet": true
     },
     "android": {
+      "versionCode": 1,
+      "package": "com.tuusuario.moneyapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -36,6 +38,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "639ede59-53ec-4789-ab4d-dd03d61b7e47"
+      }
     }
   }
 }
