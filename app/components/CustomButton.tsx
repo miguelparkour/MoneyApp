@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 2,
-    width: '100%',
+    paddingHorizontal: 10,
   },
   buttonText: {
     fontWeight: '900',

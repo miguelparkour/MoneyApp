@@ -1,7 +1,8 @@
 // /src/components/NumberInputModal.tsx
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Modal } from 'react-native';
 import ModalWrapper from './ModalWrapper';
+import CustomButton from './CustomButton';
 
 interface NumberInputModalProps<T> {
   visible: boolean;
@@ -33,12 +34,13 @@ const NumberInputModal = <T extends unknown>({
   useEffect(() => {
     if (visible) {
       setInputValue(initialValue);
+      // Pequeño delay para asegurarse de que el modal y el input están montados
       setTimeout(() => {
         inputRef.current?.focus();
-        setSelectOnFocus(true);
-      }, 200);
+      }, 300); // prueba con 300ms
     }
   }, [visible, initialValue]);
+  
 
   const handleConfirm = () => {
     const parsed = parseFloat(inputValue);
@@ -55,48 +57,82 @@ const NumberInputModal = <T extends unknown>({
   };
 
   return (
-    <ModalWrapper visible={visible}>
-      <Text style={styles.modalTitle}>{title}</Text>
-      <TextInput
-        ref={inputRef}
-        style={styles.input}
-        keyboardType="numeric"
-        placeholder={placeholder}
-        value={inputValue}
-        onChangeText={setInputValue}
-        selection={
-          selectOnFocus && inputValue
-            ? { start: 0, end: inputValue.length }
-            : undefined
-        }
-        onFocus={() => setSelectOnFocus(false)}
-      />
-      <View style={styles.modalButtons}>
-        <Button title="Cancelar" onPress={onCancel} />
-        <Button title="Confirmar" onPress={handleConfirm} />
+    <Modal visible={visible} transparent animationType="fade">
+      {/* Overlay semitransparente */}
+      <View style={styles.overlay}>
+        {/* Contenedor del contenido del modal */}
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>{title}</Text>
+          <TextInput
+            ref={inputRef}
+            style={styles.input}
+            keyboardType="numeric"
+            placeholder={placeholder}
+            value={inputValue}
+            onChangeText={setInputValue}
+            selectTextOnFocus={true} // SIEMPRE selecciona al hacer focus
+          />
+          <View style={styles.modalButtons}>
+            {/* Usa tu CustomButton con la misma apariencia que en la pantalla principal */}
+            <CustomButton
+              title="Cancelar"
+              color="#ea3a22"    // Rojo para cancelar
+              textColor="#fff"
+              onPress={onCancel}
+            />
+            <CustomButton
+              title="Confirmar"
+              color="#f0b801"    // Amarillo para confirmar
+              textColor="#000"
+              onPress={handleConfirm}
+            />
+          </View>
+        </View>
       </View>
-    </ModalWrapper>
+    </Modal>
   );
 };
 
+export default NumberInputModal;
+
 const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)', // Oscurece un poco el fondo
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: '#f1d49a', // Mismo beige que el fondo principal
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    borderWidth: 2, // Azul que usas en otras secciones
+    // Si usas una fuente personalizada:
+    fontFamily: 'FuturaBold' // en texto, se pone a nivel de Text/TextInput
+  },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    color: '#2985a0', // Azul que usas en otras secciones
     textAlign: 'center',
+    marginBottom: 20,
+    fontFamily: 'FuturaBold', // si la tienes configurada
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#2985a0',
     borderRadius: 5,
     padding: 10,
+    backgroundColor: '#fff',
+    color: '#000',
     marginBottom: 20,
+    fontSize: 18,
+    // fontFamily: 'FuturaBold',
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 10,
   },
 });
-
-export default NumberInputModal;

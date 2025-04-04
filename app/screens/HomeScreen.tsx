@@ -11,6 +11,7 @@ const HomeScreen = () => {
   const [dailyWage, setDailyWage] = useState<{ value: number; date: string } | null>(null);
   const [showWageModal, setShowWageModal] = useState<boolean>(false);
   const [showExpenseModal, setShowExpenseModal] = useState<boolean>(false);
+  const [showBalanceModal, setShowBalanceModal] = useState<boolean>(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -67,11 +68,6 @@ const HomeScreen = () => {
     saveDailyWage();
   }, [dailyWage]);
 
-  // Método para poner el día de ayer en dailyWage (si lo necesitas)
-  const setYesterday = async () => {
-    // ...
-  };
-
   // Método que elimina todos los datos
   const deleteAllData = async () => {
     try {
@@ -97,12 +93,16 @@ const HomeScreen = () => {
     );
   };
 
+  const handleBalancePress = () => {
+    setShowBalanceModal(true);
+  };
+
   return (
     <View style={styles.container}>
       {/* Cabecera */}
       <View style={styles.header}>
-        <Text style={styles.headerText1}>Finanzas</Text>
-        <Text style={styles.headerText2}>Personales</Text>
+        <Text style={styles.headerText1}>DinDin</Text>
+        <Text style={styles.headerText2}>Diario</Text>
       </View>
 
       {/* Saldo disponible */}
@@ -110,24 +110,27 @@ const HomeScreen = () => {
         <Text style={styles.balanceLabel}>Saldo disponible</Text>
         <Text
           style={styles.balanceText}
-          onPress={setYesterday}
+          onPress={handleBalancePress} 
           onLongPress={handleLongPress}
         >
           {balance}€
         </Text>
+        {dailyWage && (
+          <Text style={styles.balanceSubInfo}>Paga diaria: {`+${dailyWage.value}`}€</Text>
+        )}
       </View>
 
       {/* Botones */}
       <View style={styles.buttonsSection}>
         <CustomButton
           title="Añadir paga diaria"
-          color="#f0b801"       // Botón amarillo
+          color="#f0b801"
           textColor="#000"
           onPress={() => setShowWageModal(true)}
         />
         <CustomButton
           title="Añadir gasto manual"
-          color="#f1d49a"       // Botón beige claro
+          color="#f1d49a"
           textColor="#000"
           onPress={() => setShowExpenseModal(true)}
         />
@@ -141,6 +144,14 @@ const HomeScreen = () => {
         initialValue={dailyWage ? dailyWage.value.toString() : ''}
         transform={(value) => ({ value, date: new Date().toISOString() })}
         onConfirm={(newWage) => {
+          Alert.alert(
+            'Añadir paga diaria',
+            `¿Quieres añadir ${newWage.value}€ a tu saldo de hoy?`,
+            [
+              { text: 'No', onPress: () => { }, style: 'cancel' },
+              { text: 'Sí', onPress: () => setBalance(prev => prev + newWage.value) }
+            ]
+          );
           setDailyWage(newWage);
           setShowWageModal(false);
         }}
@@ -158,6 +169,19 @@ const HomeScreen = () => {
         }}
         onCancel={() => setShowExpenseModal(false)}
       />
+
+      {/* Modal para editar el balance */}
+      <NumberInputModal
+        visible={showBalanceModal}
+        title="Editar saldo"
+        placeholder="Ingresa el nuevo saldo"
+        initialValue={balance.toString()}
+        onConfirm={(newBalance: number) => {
+          setBalance(newBalance);
+          setShowBalanceModal(false);
+        }}
+        onCancel={() => setShowBalanceModal(false)}
+      />
     </View>
   );
 };
@@ -165,49 +189,40 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f1d49a', // color de fondo beige claro
+    backgroundColor: '#f1d49a',
     width: '100%',
     justifyContent: 'space-between',
+    position: 'relative',
   },
   header: {
+    zIndex: 0,
     display: 'flex',
     backgroundColor: '#ea3a22',
-    paddingVertical: 60,
+    paddingVertical: 30,
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+    borderBottomWidth: 2,
+    borderBottomColor: 'rgba(88, 24, 16, 0.5)',
   },
   headerText1: {
-    fontSize: 40,
-    fontWeight: '900',
-    color: '#000',
-    textTransform: 'uppercase',
-    letterSpacing: 2,
     fontFamily: 'FuturaBold',
-    flex: 1,
-    display: 'flex',
-    alignSelf: 'center'
+    fontSize: 60,
   },
-  headerText2:{
-    fontSize: 40,
-    fontWeight: '900',
-    color: '#000',
-    textTransform: 'uppercase',
-    letterSpacing: 2,
+  headerText2: {
     fontFamily: 'FuturaBold',
-    flex: 1,
+    fontSize: 60,
   },
-  
   balanceSection: {
-    // Mantenemos el mismo fondo que el container para que se vea uniforme
     paddingVertical: 30,
     alignItems: 'center',
     width: '100%',
   },
   balanceLabel: {
     fontSize: 18,
-    color: '#2d88c3', // Azul
-    marginBottom: 10,
+    color: '#2d88c3',
+    marginTop: 10,
+    fontFamily: 'FuturaBold',
   },
   balanceText: {
     fontSize: 100,
@@ -215,12 +230,19 @@ const styles = StyleSheet.create({
     color: '#000',
     fontFamily: 'FuturaBold',
   },
+  balanceSubInfo: {
+    fontSize: 18,
+    color: '#2d88c3',
+    marginTop: 10,
+  },
   buttonsSection: {
-    backgroundColor: '#2985a0', // color azul
+    backgroundColor: '#2985a0',
     paddingHorizontal: 30,
     paddingVertical: 45,
     width: '100%',
     gap: 12,
+    borderTopWidth: 2,
+    borderTopColor: 'rgba(27, 82, 98, 0.5)',
   },
 });
 
